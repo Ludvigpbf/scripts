@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# A Script to create a new script and make it executable
+
+# Check if script name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <script-name> [scripts-folder-path]"
+    exit 1
+fi
+
+# Set the scripts folder path to the user-provided path or default to Desktop
+if [ -z "$2" ]; then
+    if command -v xdg-user-dir &> /dev/null; then
+        scripts_folder=$(xdg-user-dir DESKTOP)
+    else
+        scripts_folder="$HOME/Desktop"
+    fi
+else
+    scripts_folder="$2"
+fi
+
+# Create a new script file in the scripts folder
+touch "$scripts_folder/$1"
+
+# Make the new script executable
+chmod +x "$scripts_folder/$1"
+
+# Add a shebang line to the new script
+echo "#!/bin/bash" > "$scripts_folder/$1"
+
+# Print a success message
+echo "Created new script: $1 in $scripts_folder"

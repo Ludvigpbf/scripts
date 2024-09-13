@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Check if a project name is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <project-name>"
+    exit 1
+fi
+
+# Set the GitHub username and access token
+username="yourUsername"
+token="your_github_access_token"
+project_name=$1
+
+# Authenticate with GitHub using the provided token
+echo $token | gh auth login --with-token
+
+# Create a new private repository on GitHub
+gh repo create $project_name --private
+
+# Create a new directory for the project and navigate into it
+mkdir "$project_name"
+cd "$project_name"
+
+# --------------------- V.1 -------------------------
+# Clone the specified template repository into the current directory and remove its .git folder
+gh repo clone ludvigpbf/express-ts-template . -- --depth=1
+rm -rf .git
+
+# --------------------- V.2 -------------------------
+# Clone the template repository into the current directory and remove its .git folder
+# Note: Ensure you have an express-template repository on your own GitHub account
+# Uncomment the following lines to use this method
+# gh repo clone $username/express-ts-template . -- --depth=1
+# rm -rf .git
+
+# --------------------- V.3 -------------------------
+# Create a new Express project using a template
+# npm init express-app $project_name
+
+# Move the contents of the new project to the current directory
+# mv $project_name/* ./
+# mv $project_name/.* ./
+
+# Remove the now-empty template directory and git files
+# rm -rf $project_name
+# rm -rf .git
+
+# ----------------------------------------------------
+
+# Initialize a new git repository and set the remote origin
+git init
+git remote add origin "https://github.com/${username}/${project_name}.git"
+
+# Install project dependencies using npm
+npm install
+
+# Add node_modules to .gitignore
+echo "node_modules" >> .gitignore
+
+# Stage all files and make the initial commit
+git add .
+git commit -m "Initial commit"
+
+# Rename the default branch to main and push to the remote repository
+git branch -m master main
+git push --set-upstream origin main
+
+# Print a success message
+echo "New private repository '$project_name' has been set up."
